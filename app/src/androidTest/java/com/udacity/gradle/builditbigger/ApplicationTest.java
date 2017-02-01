@@ -10,18 +10,19 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Iris on 31/01/2017.
  * */
-public class ApplicationTest extends InstrumentationTestCase {
+public class ApplicationTest extends InstrumentationTestCase
+        implements EndpointsAsyncTask.AsyncResponse {
     public void testAsyncTask () throws Throwable {
         // create  a signal to let us know when our task is done.
         final CountDownLatch signal = new CountDownLatch(1);
 
         final EndpointsAsyncTask myTask
-                = new EndpointsAsyncTask() {
+                = new EndpointsAsyncTask(this) {
             @Override
             protected void onPostExecute(String result) {
-                assertFalse(result, equals(""));
+                delegate.processFinish(result);
                 signal.countDown();
-                }
+            }
         };
 
         // Execute the async task on the UI thread! THIS IS KEY!
@@ -29,8 +30,7 @@ public class ApplicationTest extends InstrumentationTestCase {
 
             @Override
             public void run() {
-                final MainActivity mainActivity = new MainActivity();
-                myTask.execute(new Pair<Context, String>(mainActivity, ""));
+                myTask.execute();
             }
         });
 
@@ -38,5 +38,10 @@ public class ApplicationTest extends InstrumentationTestCase {
      * above with the countDown() or 30 seconds passes and it times out.
      */
         signal.await(30, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void processFinish(String result) {
+        assertFalse(result, equals(""));
     }
 }

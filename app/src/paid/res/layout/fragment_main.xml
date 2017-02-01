@@ -15,12 +15,22 @@
         android:text="@string/instructions" />
 
     <Button
+        android:id="@+id/tell_joke_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/instructions_text_view"
         android:onClick="tellJoke"
         android:text="@string/button_text"
 
+        />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tell_joke_progress"
+        android:layout_below="@+id/instructions_text_view"
+        android:layout_toRightOf="@+id/tell_joke_button"
+        android:progressDrawable="@drawable/circular_progress_bar"
         />
 
 </RelativeLayout>

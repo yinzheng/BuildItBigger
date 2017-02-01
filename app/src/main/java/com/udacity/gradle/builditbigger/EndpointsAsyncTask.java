@@ -17,12 +17,20 @@ import java.io.IOException;
  * Created by Iris on 30/01/2017.
  */
 
-class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
+class EndpointsAsyncTask extends AsyncTask<Void, Void, String> {
+    public interface AsyncResponse {
+        void processFinish(String result);
+    }
+
     private static MyApi myApiService = null;
-    private Context context;
+    public AsyncResponse delegate = null;
+
+    public EndpointsAsyncTask(AsyncResponse delegate) {
+        this.delegate = delegate;
+    }
 
     @Override
-    protected String doInBackground(Pair<Context, String>... params) {
+    protected String doInBackground(Void... voids) {
         if(myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -41,8 +49,6 @@ class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> 
             myApiService = builder.build();
         }
 
-        context = params[0].first;
-
         try {
             return myApiService.getJoke().execute().getData();
         } catch (IOException e) {
@@ -52,8 +58,6 @@ class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> 
 
     @Override
     protected void onPostExecute(String result) {
-        Intent jokeIntent = new Intent(context, JokeActivity.class);
-        jokeIntent.putExtra(JokeActivity.JOKE_KEY, result);
-        context.startActivity(jokeIntent);
+        delegate.processFinish(result);
     }
 }
