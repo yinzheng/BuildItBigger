@@ -17,3 +17,21 @@ allprojects {
         jcenter()
     }
 }
+
+task runAndroidTest {
+
+    group = "verification"
+    description = "Run Test on GCE local development server"
+
+    evaluationDependsOn ":backend"
+
+    project(":backend"){
+        appengine{
+            daemon true
+        }
+    }
+
+    dependsOn ":app:connectedAndroidTest"
+    mustRunAfter ":backend:appengineRun"
+    finalizedBy ":backend:appengineStop"
+}
